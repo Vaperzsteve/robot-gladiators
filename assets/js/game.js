@@ -26,9 +26,9 @@ var fightOrSkip = function () {
             // subtract money from playerMoney for skipping
             playerInfo.playerMoney = Math.max(0, playerInfo.money - 10);
             return true;
-        }
-        return false;
+        }        
     }
+    return false;
 };
 
 var fight = function (enemy) {
@@ -92,10 +92,12 @@ var startGame = function () {
     // reset player stats
     playerInfo.reset();
     for (var i = 0; i < enemyInfo.length; i++) {
+        console.log(playerInfo);
         if (playerInfo.health > 0) {
             window.alert("Welcome to Robot Gladiators! Round " + (i + 1));
             var pickedEnemyObj = enemyInfo[i];
             pickedEnemyObj.health = randomNumber(40, 60);
+            console.log(pickedEnemyObj);
             fight(pickedEnemyObj);
             // if we're not at the last enermy in the array
             if (playerInfo.health > 0 && i < enemyInfo.length - 1) {
@@ -119,13 +121,19 @@ var startGame = function () {
 // function to end the entire game
 var endGame = function () {
     window.alert("The game has now ended. Let's see how you did!")
-    // if player is still alive, player wins!
-    if (playerInfo.health > 0) {
-        window.alert("Great job, you've survived the game! You now have a score of "
-            + playerInfo.money + ".");
+    // check local storage for high score, if it's not there, use 0
+    var highScore = localStorage.getItem("highscore");
+    highScore = highScore || 0;
+
+    // if player has more money than the high score, player has new high score!
+    if (playerInfo.money > highScore) {
+        localStorage.setItem("highscore", playerInfo.money);
+        localStorage.setItem("name", playerInfo.name);
+        window.alert(playerInfo.name + " now has the high score of " + playerInfo.money + "!");
     } else {
-        window.alert("You've lost your robot in battle.");
+        window.alert(playerInfo.name + " did not beat the high score of " + highScore + ". Maybe next time!");
     }
+   
     // ask player if they'd like to play again
     var playAgainConfirm = window.confirm("Would you like to play again?");
 
@@ -164,7 +172,7 @@ var shop = function () {
 // function to set name
 var getPlayerName = function () {
     var name = "";
-    while (name === "" || name === null) {
+    while (!name) {
         name = prompt("What is your robot's name?");
     }
     console.log("Your robot's name is " + name);
@@ -216,10 +224,6 @@ var enemyInfo = [
     }
 ];
 
-console.log(enemyInfo);
-console.log(enemyInfo[0]);
-console.log(enemyInfo[0].name);
-console.log(enemyInfo[0]['attack']);
 
 // start the game when the page loads
 startGame();
